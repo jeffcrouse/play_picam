@@ -28,12 +28,14 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 1. `sudo reboot`
 1. `sudo ip addr show`
 1. `startx`
+1. [Make sure composite video works](http://elinux.org/R-Pi_Troubleshooting#Composite_displays_no_image) Is the Pi configuration forcing HDMI output? Inspect the file "config.txt" in the boot partition of your memory card and look for the line "hdmi_force_hotplug=1". If you see this line, comment it out (in particular, look at the end of "config.txt", in the section entitled "NOOBS Auto-generated Settings:")
 1. [change hostname to something useful](http://www.howtogeek.com/167195/how-to-change-your-raspberry-pi-or-other-linux-devices-hostname/)
 	1. `sudo nano /etc/hosts`
 	1. `sudo nano /etc/hostname`
 	1. `sudo /etc/init.d/hostname.sh`
 	1. `sudo reboot`
 1. Use "WiFi Config" to set up wireless
+1. [Set up Bonjour/ZeroConf for easy access on network](http://www.raspberrypi.org/forums/viewtopic.php?f=66&t=18207)
 1. [Raspberry Pi - Getting Started (openFrameworks)](http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html)
 	1. `cd`
 	1. `curl -O http://www.openframeworks.cc/versions/v0.8.4/	of_v0.8.4_linuxarmv6l_release.tar.gz`
