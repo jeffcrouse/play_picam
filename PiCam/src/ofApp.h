@@ -4,6 +4,7 @@
 #include "ofxOsc.h"
 #include "ConsoleListener.h"
 #include "ofxRPiCameraVideoGrabber.h"
+#include "ImageFilterCollection.h"
 
 #define PORT 12345
 
@@ -12,7 +13,7 @@ class ofApp : public ofBaseApp, public SSHKeyListener{
 		void setup();
 		void update();
 		void draw();
-		
+
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y);
@@ -26,7 +27,7 @@ class ofApp : public ofBaseApp, public SSHKeyListener{
 		ofTrueTypeFont font;
 		ofxOscReceiver receiver;
 
-		int current_msg_string;
+		string current_msg_string;
 
 		void onCharacterReceived(SSHKeyListenerEventData& e);
 		ConsoleListener consoleListener;

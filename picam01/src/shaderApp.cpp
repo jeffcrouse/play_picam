@@ -7,13 +7,14 @@ void shaderApp::setup()
 	ofSetLogLevel("ofThread", OF_LOG_SILENT);
 	ofSetVerticalSync(false);
 	ofEnableAlphaBlending();
+	ofSetFullscreen(true);
 	
 	doDrawInfo	= true;
 		
 	consoleListener.setup(this);
 	
-	omxCameraSettings.width = 1280;
-	omxCameraSettings.height = 720;
+	omxCameraSettings.width = 640;
+	omxCameraSettings.height = 480;
 	omxCameraSettings.framerate = 30;
 	omxCameraSettings.isUsingTexture = true;
 	
@@ -57,7 +58,7 @@ void shaderApp::draw(){
 	
 	if (doShader)
 	{
-		fbo.draw(0, 0);		
+		fbo.draw(0, 0, ofGetWidth(), ofGetHeight());		
 	}else 
 	{
 		videoGrabber.draw();

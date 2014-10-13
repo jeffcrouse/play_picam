@@ -9,7 +9,7 @@ void ofApp::setup(){
 
 
 	consoleListener.setup(this);
-	
+
 	omxCameraSettings.width = 1280;
 	omxCameraSettings.height = 720;
 	omxCameraSettings.framerate = 30;
@@ -22,7 +22,7 @@ void ofApp::setup(){
 	receiver.setup(PORT);
 
 	font.loadFont("verdana.ttf", 48);
-	current_msg_string = 0;
+	current_msg_string = "none";
 }
 
 //--------------------------------------------------------------
@@ -32,10 +32,10 @@ void ofApp::update(){
 		// get the next message
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
-        
+
 		// check for mouse moved message
 		if(m.getAddress() == "/message"){
-			current_msg_string = m.getArgAsString();
+			current_msg_string = m.getArgAsString(0);
 		}
 	}
 }
@@ -45,11 +45,11 @@ void ofApp::draw(){
 	ofSetColor(225);
 	videoGrabber.draw();
 
-	verdana14.drawString(current_msg_string, 30, 35);
+	font.drawString(current_msg_string, 30, 35);
 }
 
 //--------------------------------------------------------------
-void shaderApp::onCharacterReceived(SSHKeyListenerEventData& e)
+void ofApp::onCharacterReceived(SSHKeyListenerEventData& e)
 {
 	keyPressed((int)e.character);
 }
@@ -58,7 +58,7 @@ void shaderApp::onCharacterReceived(SSHKeyListenerEventData& e)
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	ofLogVerbose(__func__) << key;
-	
+
 	if (key == 'e')
 	{
 		videoGrabber.applyImageFilter(filterCollection.getNextFilter());
@@ -101,6 +101,6 @@ void ofApp::gotMessage(ofMessage msg){
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
