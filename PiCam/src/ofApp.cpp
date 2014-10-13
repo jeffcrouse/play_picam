@@ -5,23 +5,29 @@ void ofApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofSetLogLevel("ofThread", OF_LOG_SILENT);
 	ofSetVerticalSync(false);
-	ofEnableAlphaBlending();
+	//ofEnableAlphaBlending();
 
 	consoleListener.setup(this);
 
-	omxCameraSettings.width = 1920;
-	omxCameraSettings.height = 1080;
+	omxCameraSettings.width = 1024;
+	omxCameraSettings.height = 768;
 	omxCameraSettings.framerate = 30;
 	omxCameraSettings.isUsingTexture = true;
 
 	videoGrabber.setup(omxCameraSettings);
-	filterCollection.setup();
 
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
 
 	font.loadFont("verdana.ttf", 48);
-	
+
+    map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
+    while (it != OMX_Maps::getInstance().imageFilters.end())
+    {
+        string name = (*it).first;
+        ofLogNotice() << name;
+    }
+
 }
 
 /*
@@ -44,7 +50,7 @@ void ofApp::update(){
 		// check for mouse moved message
 		if(m.getAddress() == "/message"){
 			TextLine line;
-			line.text = m.getArgAsString(0)
+			line.text = m.getArgAsString(0);
 			line.color.r = m.getArgAsInt32(1);
 			line.color.g = m.getArgAsInt32(2);
 			line.color.b = m.getArgAsInt32(3);
@@ -56,14 +62,14 @@ void ofApp::update(){
 
 
 		if(m.getAddress() == "/filter") {
-			string filter = m.getArgAsString(0);
+			string newName = m.getArgAsString(0);
 			map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
-			while (it != OMX_Maps::getInstance().imageFilters.end()) 
+			while (it != OMX_Maps::getInstance().imageFilters.end())
 			{
 				string name = (*it).first;
 				OMX_IMAGEFILTERTYPE filter = (*it).second;
 
-				if (filter == name)  {
+				if (name == newName)  {
 					videoGrabber.applyImageFilter(filter);
 				}
 			}
@@ -95,7 +101,7 @@ void ofApp::draw(){
 	}
 
 
-	
+
 }
 
 //--------------------------------------------------------------
