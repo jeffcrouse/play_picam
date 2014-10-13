@@ -4,9 +4,14 @@
 #include "ofxOsc.h"
 #include "ConsoleListener.h"
 #include "ofxRPiCameraVideoGrabber.h"
-#include "ImageFilterCollection.h"
+#include "OMX_Maps.h"
 
 #define PORT 12345
+
+struct TextLine {
+	string text;
+	ofColor color;
+};
 
 class ofApp : public ofBaseApp, public SSHKeyListener{
 	public:
@@ -27,12 +32,11 @@ class ofApp : public ofBaseApp, public SSHKeyListener{
 		ofTrueTypeFont font;
 		ofxOscReceiver receiver;
 
-		string current_msg_string;
+		vector<TextLine> lines;
 
 		void onCharacterReceived(SSHKeyListenerEventData& e);
 		ConsoleListener consoleListener;
 		ofxRPiCameraVideoGrabber videoGrabber;
 
 		OMXCameraSettings omxCameraSettings;
-		ImageFilterCollection filterCollection;
 };

@@ -7,11 +7,10 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofEnableAlphaBlending();
 
-
 	consoleListener.setup(this);
 
-	omxCameraSettings.width = 1280;
-	omxCameraSettings.height = 720;
+	omxCameraSettings.width = 1920;
+	omxCameraSettings.height = 1080;
 	omxCameraSettings.framerate = 30;
 	omxCameraSettings.isUsingTexture = true;
 
@@ -22,8 +21,17 @@ void ofApp::setup(){
 	receiver.setup(PORT);
 
 	font.loadFont("verdana.ttf", 48);
-	current_msg_string = "none";
+	
 }
+
+/*
+struct TextLine {
+	string text;
+	int size;
+	bool centered;
+	ofColor color;
+};
+*/
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -35,7 +43,30 @@ void ofApp::update(){
 
 		// check for mouse moved message
 		if(m.getAddress() == "/message"){
-			current_msg_string = m.getArgAsString(0);
+			TextLine line;
+			line.text = m.getArgAsString(0)
+			line.color.r = m.getArgAsInt32(1);
+			line.color.g = m.getArgAsInt32(2);
+			line.color.b = m.getArgAsInt32(3);
+			lines.push_back( line );
+			if(lines.size()>10) {
+				lines.erase(lines.begin());
+			}
+		}
+
+
+		if(m.getAddress() == "/filter") {
+			string filter = m.getArgAsString(0);
+			map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
+			while (it != OMX_Maps::getInstance().imageFilters.end()) 
+			{
+				string name = (*it).first;
+				OMX_IMAGEFILTERTYPE filter = (*it).second;
+
+				if (filter == name)  {
+					videoGrabber.applyImageFilter(filter);
+				}
+			}
 		}
 	}
 }
@@ -45,7 +76,26 @@ void ofApp::draw(){
 	ofSetColor(225);
 	videoGrabber.draw();
 
-	font.drawString(current_msg_string, 30, 35);
+	int y = 60;
+	for(int i=0; i<lines.size(); i++) {
+		TextLine& line = lines[i];
+
+
+		ofPushStyle();
+		ofSetColor(line.color);
+
+
+		ofRectangle box = font.getStringBoundingBox(line.text, 0, 0);
+		int x = (ofGetWidth()/2.0) - (box.width/2.0);
+
+		font.drawString(line.text, x, y);
+		y += 50;
+
+		ofPopStyle();
+	}
+
+
+	
 }
 
 //--------------------------------------------------------------
@@ -58,11 +108,6 @@ void ofApp::onCharacterReceived(SSHKeyListenerEventData& e)
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	ofLogVerbose(__func__) << key;
-
-	if (key == 'e')
-	{
-		videoGrabber.applyImageFilter(filterCollection.getNextFilter());
-	}
 }
 
 //--------------------------------------------------------------
