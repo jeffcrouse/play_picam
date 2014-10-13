@@ -7,7 +7,7 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofEnableAlphaBlending();
 
-	consoleListener.setup(this);
+	//consoleListener.setup(this);
 
 	omxCameraSettings.width = 1024;
 	omxCameraSettings.height = 768;
@@ -21,23 +21,13 @@ void ofApp::setup(){
 
 	font.loadFont("verdana.ttf", 48);
 
-    map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
-    while (it != OMX_Maps::getInstance().imageFilters.end())
+	for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
+				it!=OMX_Maps::getInstance().imageFilters.end(); ++it)
     {
-        string name = (*it).first;
-        ofLogNotice() << name;
+        ofLogNotice() << (*it).first;
     }
 
 }
-
-/*
-struct TextLine {
-	string text;
-	int size;
-	bool centered;
-	ofColor color;
-};
-*/
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -63,8 +53,8 @@ void ofApp::update(){
 
 		if(m.getAddress() == "/filter") {
 			string newName = m.getArgAsString(0);
-			map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
-			while (it != OMX_Maps::getInstance().imageFilters.end())
+			for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
+				it!=OMX_Maps::getInstance().imageFilters.end(); ++it)
 			{
 				string name = (*it).first;
 				OMX_IMAGEFILTERTYPE filter = (*it).second;
@@ -86,10 +76,8 @@ void ofApp::draw(){
 	for(int i=0; i<lines.size(); i++) {
 		TextLine& line = lines[i];
 
-
 		ofPushStyle();
 		ofSetColor(line.color);
-
 
 		ofRectangle box = font.getStringBoundingBox(line.text, 0, 0);
 		int x = (ofGetWidth()/2.0) - (box.width/2.0);
@@ -105,10 +93,10 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::onCharacterReceived(SSHKeyListenerEventData& e)
-{
-	keyPressed((int)e.character);
-}
+// void ofApp::onCharacterReceived(SSHKeyListenerEventData& e)
+// {
+// 	keyPressed((int)e.character);
+// }
 
 
 //--------------------------------------------------------------
