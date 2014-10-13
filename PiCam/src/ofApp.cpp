@@ -5,12 +5,12 @@ void ofApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofSetLogLevel("ofThread", OF_LOG_SILENT);
 	ofSetVerticalSync(false);
-	ofEnableAlphaBlending();
+	//ofEnableAlphaBlending();
 
 	consoleListener.setup(this);
 
-	omxCameraSettings.width = 1920;
-	omxCameraSettings.height = 1080;
+	omxCameraSettings.width = 1024;
+	omxCameraSettings.height = 768;
 	omxCameraSettings.framerate = 30;
 	omxCameraSettings.isUsingTexture = true;
 
@@ -20,6 +20,13 @@ void ofApp::setup(){
 	receiver.setup(PORT);
 
 	font.loadFont("verdana.ttf", 48);
+
+    map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
+    while (it != OMX_Maps::getInstance().imageFilters.end())
+    {
+        string name = (*it).first;
+        ofLogNotice() << name;
+    }
 
 }
 
