@@ -21,11 +21,10 @@ void ofApp::setup(){
 
 	font.loadFont("verdana.ttf", 48);
 
-    map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
-    while (it != OMX_Maps::getInstance().imageFilters.end())
+	for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
+				it!=OMX_Maps::getInstance().imageFilters.end(); ++it)
     {
-        string name = (*it).first;
-        ofLogNotice() << name;
+        ofLogNotice() << (*it).first;
     }
 
 }
@@ -54,8 +53,8 @@ void ofApp::update(){
 
 		if(m.getAddress() == "/filter") {
 			string newName = m.getArgAsString(0);
-			map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
-			while (it != OMX_Maps::getInstance().imageFilters.end())
+			for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
+				it!=OMX_Maps::getInstance().imageFilters.end(); ++it)
 			{
 				string name = (*it).first;
 				OMX_IMAGEFILTERTYPE filter = (*it).second;
