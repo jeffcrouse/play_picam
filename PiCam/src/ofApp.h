@@ -13,7 +13,7 @@ struct TextLine {
 	ofColor color;
 };
 
-class ofApp : public ofBaseApp, public SSHKeyListener{
+class ofApp : public ofBaseApp { //, public SSHKeyListener{
 	public:
 		void setup();
 		void update();
@@ -34,8 +34,8 @@ class ofApp : public ofBaseApp, public SSHKeyListener{
 
 		vector<TextLine> lines;
 
-		void onCharacterReceived(SSHKeyListenerEventData& e);
-		ConsoleListener consoleListener;
+		//void onCharacterReceived(SSHKeyListenerEventData& e);
+		//ConsoleListener consoleListener;
 		ofxRPiCameraVideoGrabber videoGrabber;
 
 		OMXCameraSettings omxCameraSettings;

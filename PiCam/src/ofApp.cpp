@@ -5,9 +5,9 @@ void ofApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofSetLogLevel("ofThread", OF_LOG_SILENT);
 	ofSetVerticalSync(false);
-	//ofEnableAlphaBlending();
+	ofEnableAlphaBlending();
 
-	consoleListener.setup(this);
+	//consoleListener.setup(this);
 
 	omxCameraSettings.width = 1024;
 	omxCameraSettings.height = 768;
@@ -29,15 +29,6 @@ void ofApp::setup(){
     }
 
 }
-
-/*
-struct TextLine {
-	string text;
-	int size;
-	bool centered;
-	ofColor color;
-};
-*/
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -86,10 +77,8 @@ void ofApp::draw(){
 	for(int i=0; i<lines.size(); i++) {
 		TextLine& line = lines[i];
 
-
 		ofPushStyle();
 		ofSetColor(line.color);
-
 
 		ofRectangle box = font.getStringBoundingBox(line.text, 0, 0);
 		int x = (ofGetWidth()/2.0) - (box.width/2.0);
@@ -105,10 +94,10 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::onCharacterReceived(SSHKeyListenerEventData& e)
-{
-	keyPressed((int)e.character);
-}
+// void ofApp::onCharacterReceived(SSHKeyListenerEventData& e)
+// {
+// 	keyPressed((int)e.character);
+// }
 
 
 //--------------------------------------------------------------
