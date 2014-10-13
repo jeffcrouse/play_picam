@@ -34,8 +34,9 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 	1. `sudo nano /etc/hostname`
 	1. `sudo /etc/init.d/hostname.sh`
 	1. `sudo reboot`
-1. Use "WiFi Config" to set up wireless
 1. [Set up Bonjour/ZeroConf for easy access on network](http://www.raspberrypi.org/forums/viewtopic.php?f=66&t=18207)
+	1. sudo apt-get install libnss-mdns
+1. Use "WiFi Config" to set up wireless
 1. [Raspberry Pi - Getting Started (openFrameworks)](http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html)
 	1. `cd`
 	1. `curl -O http://www.openframeworks.cc/versions/v0.8.4/	of_v0.8.4_linuxarmv6l_release.tar.gz`
@@ -48,4 +49,7 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 	1. `make`
 	1. `make run`
 1. get https://github.com/jvcleave/ofxRPiCameraVideoGrabber
+1. [Setup auto-login and run script](http://www.opentechguides.com/how-to/article/raspberry-pi/5/raspberry-pi-auto-start.html)
+	1. Enable auto-login 
+	1. `sudo nano /etc/profile`
 1. When you are reset to shutdown: `sudo halt`
