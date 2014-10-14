@@ -10,8 +10,6 @@ void shaderApp::setup()
 	ofSetFullscreen(true);
 	
 	doDrawInfo	= true;
-		
-	consoleListener.setup(this);
 	
 	omxCameraSettings.width = 640;
 	omxCameraSettings.height = 480;
@@ -22,11 +20,16 @@ void shaderApp::setup()
 
 	shader.load("shaderExample");
 	
-	fbo.allocate(omxCameraSettings.width, omxCameraSettings.height);
-	fbo.begin();
+	camFbo.allocate(omxCameraSettings.width, omxCameraSettings.height);
+	camFbo.begin();
 		ofClear(0, 0, 0, 0);
-	fbo.end();
+	camFbo.end();
 	
+	overlayFbo.allocate(omxCameraSettings.width, omxCameraSettings.height);
+	overlayFbo.begin();
+		ofClear(0, 0, 0, 0);
+	overlayFbo.end();
+
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
 
@@ -43,6 +46,8 @@ void shaderApp::setup()
 //--------------------------------------------------------------
 void shaderApp::update()
 {
+	bool overlayChanged = false;
+
 	// check for waiting messages
 	while(receiver.hasWaitingMessages()){
 		// get the next message
@@ -50,11 +55,13 @@ void shaderApp::update()
 		receiver.getNextMessage(&m);
 
 		if(m.getAddress() == "/lineOne"){
-			lineOne = m.getArgAsString(0);
+			lineOne = ofToString(m.getArgAsInt32(0));
+			overlayChanged = true;
 		}
 
 		if(m.getAddress() == "/lineTwo"){
 			lineTwo = m.getArgAsString(0);
+			overlayChanged = true;
 		}
 
 		if(m.getAddress() == "/filter") {
@@ -76,16 +83,35 @@ void shaderApp::update()
 
 	if (videoGrabber.isFrameNew())
 	{
-
-		fbo.begin();
+		camFbo.begin();
 		ofClear(0, 0, 0, 0);
 		shader.begin();
 			shader.setUniformTexture("tex0", videoGrabber.getTextureReference(), videoGrabber.getTextureID());
 			shader.setUniform1f("time", ofGetElapsedTimef());
-			shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+			shader.setUniform2f("resolution", videoGrabber.getWidth(), videoGrabber.getHeight());
 			videoGrabber.draw();
 		shader.end();
-		fbo.end();
+		camFbo.end();
+	}
+
+	if(overlayChanged)
+	{
+		overlayFbo.begin();
+			ofClear(0, 0, 0, 0);
+		
+			ofRectangle box;
+			int x;
+			int y = font[0].getLineHeight()+50;
+		
+			box = font[0].getStringBoundingBox(lineOne, 0, 0);
+			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+			font[0].drawString(lineOne, x, y);
+			
+			y += font[1].getLineHeight()+50;
+			box = font[1].getStringBoundingBox(lineTwo, 0, 0);
+			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+			font[1].drawString(lineTwo, x, y);
+		overlayFbo.end();
 	}
 
 }
@@ -94,7 +120,9 @@ void shaderApp::update()
 //--------------------------------------------------------------
 void shaderApp::draw(){
 	
-	fbo.draw(0, 0, ofGetWidth(), ofGetHeight());		
+	camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());		
+	overlayFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+
 
 	stringstream info;
 	info << "APP FPS: " << ofGetFrameRate() << "\n";
@@ -106,18 +134,7 @@ void shaderApp::draw(){
 		ofDrawBitmapStringHighlight(info.str(), 100, 100, ofColor::black, ofColor::yellow);
 	}
 
-	ofRectangle box;
-	int x;
-	int y = font[0].getLineHeight()+50;
-
-	box = font[0].getStringBoundingBox(lineOne, 0, 0);
-	x = (ofGetWidth()/2.0) - (box.width/2.0);
-	font[0].drawString(lineOne, x, y);
 	
-	y += font[1].getLineHeight()+50;
-	box = font[1].getStringBoundingBox(lineTwo, 0, 0);
-	x = (ofGetWidth()/2.0) - (box.width/2.0);
-	font[1].drawString(lineOne, x, y);	
 }
 
 //--------------------------------------------------------------

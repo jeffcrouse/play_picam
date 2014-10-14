@@ -25,7 +25,8 @@ class shaderApp : public ofBaseApp {
 	ofxRPiCameraVideoGrabber videoGrabber;
 	bool doDrawInfo;
 	
-	ofFbo fbo;
+	ofFbo camFbo;
+	ofFbo overlayFbo;
 	ofShader shader;
 	string currentFilter;
 	OMXCameraSettings omxCameraSettings;
