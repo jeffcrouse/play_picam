@@ -23,7 +23,7 @@ void shaderApp::setup()
 	ofEnableAlphaBlending();
 	ofSetFullscreen(true);
 	
-	doDrawInfo = false;
+	doDrawInfo = true;
 	
 	OMXCameraSettings omxCameraSettings;
 	omxCameraSettings.width = 640;
@@ -77,6 +77,7 @@ void shaderApp::setup()
 //--------------------------------------------------------------
 void shaderApp::update()
 {
+	float now = ofGetElapsedTimef();
 	bool textChanged = false;
 
 	// check for waiting messages
@@ -151,8 +152,10 @@ void shaderApp::update()
 				string name = pieces[len-1];
 				string path = ofToDataPath("images/"+name);
 				
-				ofLogNotice() << "Saving " << url << " to " << path;
-				ofSaveURLTo(url, path);
+				if(ofFile::doesFileExist(path, false)==false) {
+					ofLogNotice() << "Saving " << url << " to " << path;
+					ofSaveURLTo(url, path);
+				}
 
 				gifFrame = 0;
 				
@@ -166,7 +169,7 @@ void shaderApp::update()
 	}
 
 
-	if (videoGrabber.isFrameNew() && displayMode == MODE_VIDEO)
+	if (videoGrabber.isFrameNew() && displayMode == MODE_CAMERA)
 	{
 		camFbo.begin();
 		ofClear(0, 0, 0, 0);
@@ -210,6 +213,16 @@ void shaderApp::update()
 		overlayFbo.end();
 	}
 
+	if(displayMode==MODE_IMAGE) {
+		
+		if(now > gifAdvanceFrame) {
+			gifFrame = (gifFrame+1) % gifLoader.pages.size();
+			gifAdvanceFrame = now + gifFrameRate;
+		}
+		gifBounds.width = gifLoader.pages[gifFrame].getWidth();
+		gifBounds.height = gifLoader.pages[gifFrame].getHeight();
+	}
+
 }
 
 
@@ -217,25 +230,21 @@ void shaderApp::update()
 void shaderApp::draw(){
 	ofBackground(0);
 
-	float now = ofGetElapsedTimef();
-
 	switch(displayMode) {
-	case MODE_CAMERA:
-		camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
-		break;
-	case MODE_VIDEO:
-		omxPlayer.draw(0, 0, ofGetWidth(), ofGetHeight());
-		break;
-	case MODE_IMAGE:
-		if(now > gifAdvanceFrame) {
-			gifFrame = (gifFrame+1) % gifLoader.pages.size();
-			gifAdvanceFrame = ofGetElapsedTimef() + gifFrameRate;
-		}
-		int width = gifLoader.pages[gifFrame].getWidth();
-		int height = gifLoader.pages[gifFrame].getHeight();
-		
-		gifLoader.pages[gifFrame].draw(0, 0, ofGetWidth(), ofGetHeight());
-		break;
+		case MODE_CAMERA:
+			camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+			break;
+
+		case MODE_VIDEO:
+			omxPlayer.draw(0, 0, ofGetWidth(), ofGetHeight());
+			break;
+
+		case MODE_IMAGE:
+			gifLoader.pages[gifFrame].draw(gifBounds);
+			break;
+		default:
+			ofLogWarning() << "INVALID DISPLAY MODE!";
+			break;
 	}
 	
 	overlayFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -248,7 +257,7 @@ void shaderApp::draw(){
 	info << "CURRENT VIDEO: " << currentVideo << " ";
 	info << "(" << omxPlayer.getCurrentFrame() << "/" << omxPlayer.getTotalNumFrames() << ")" << endl;
 	info << "CURRENT IMAGE: " << currentImage << endl;
-
+	info << "DISPLAY MODE: " << displayMode << endl;
 	if (doDrawInfo) 
 	{
 		ofDrawBitmapStringHighlight(info.str(), 100, 100, ofColor::black, ofColor::yellow);

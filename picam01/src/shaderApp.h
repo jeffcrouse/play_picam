@@ -10,9 +10,9 @@
 
 #define PORT 12345
 
-#define MODE_CAMERA 0
-#define MODE_VIDEO 1
-#define MODE_IMAGE 2
+#define MODE_CAMERA 1
+#define MODE_VIDEO 2
+#define MODE_IMAGE 3
 
 class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 
@@ -52,5 +52,6 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 	int gifFrame;
 	float gifFrameRate;
 	float gifAdvanceFrame;
+	ofRectangle gifBounds;
 };
 
