@@ -162,8 +162,7 @@ void shaderApp::update()
 				gifFrame = 0;
 				
 				ofLogNotice() << "loading " << path;
-				decoder.decode(path);
-				file = decoder.getFile();
+				
 				ofLogNotice() << "done!";
 
 				gifAdvanceFrame = now-1;
@@ -221,13 +220,13 @@ void shaderApp::update()
 
 	if(displayMode==MODE_IMAGE && now > gifAdvanceFrame) {
 
+		int totalFrames = 10;
+		gifFrame = (gifFrame+1) % totalFrames;
 		
-		gifFrame = (gifFrame+1) % gifLoader.pages.size();
-		
-		ofLogNotice() << "Advancing GIF frame ("<< gifFrame << "/" << gifLoader.pages.size() << ")";
+		ofLogNotice() << "Advancing GIF frame ("<< gifFrame << "/" << totalFrames << ")";
 
-		int w = file.getWidth();
-		int h = file.getHeight();
+		int w = 0; //file.getWidth();
+		int h = 0; //file.getHeight();
 
 		if(h > w) {
 			gifBounds.height = ofGetHeight();
@@ -261,8 +260,7 @@ void shaderApp::draw(){
 			break;
 
 		case MODE_IMAGE:
-			file.drawFrame(gifFrame, gifBounds.x, gifBounds.y, gifBounds.width, gifBounds.height);
-			//gifLoader.pages[gifFrame].draw(gifBounds);
+
 			break;
 		default:
 			ofLogWarning() << "INVALID DISPLAY MODE!";

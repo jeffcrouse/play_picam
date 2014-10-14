@@ -1,4 +1,3 @@
 ofxRPiCameraVideoGrabber
 ofxOsc
 ofxOMXPlayer
-ofxGifDecoder

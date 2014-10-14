@@ -6,8 +6,6 @@
 #include "OMX_Maps.h"
 #include "ofxOsc.h"
 #include "ofxOMXPlayer.h"
-#include "ofxGifDecoder.h"
-#include "ofxGifFile.h"
 
 #define PORT 12345
 
@@ -49,8 +47,6 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 	string currentVideo;
 	string currentImage;
 
-	ofxGifDecoder decoder;
-	ofxGifFile file;	
 
 	int gifFrame;
 	float gifFrameRate;
