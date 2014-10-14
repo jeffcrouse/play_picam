@@ -2,11 +2,18 @@
 
 #include "ofMain.h"
 #include "ofAppEGLWindow.h"
-#include "ConsoleListener.h"
 #include "ofxRPiCameraVideoGrabber.h"
-#include "ImageFilterCollection.h"
+#include "OMX_Maps.h"
+#include "ofxOsc.h"
 
-class shaderApp : public ofBaseApp, public SSHKeyListener{
+#define PORT 12345
+
+struct TextLine {
+	string text;
+	ofColor color;
+};
+
+class shaderApp : public ofBaseApp {
 
 	public:
 
@@ -15,18 +22,20 @@ class shaderApp : public ofBaseApp, public SSHKeyListener{
 		void draw();
 		void keyPressed(int key);
 
-	void onCharacterReceived(SSHKeyListenerEventData& e);
-	ConsoleListener consoleListener;
 	ofxRPiCameraVideoGrabber videoGrabber;
-	
-	ImageFilterCollection filterCollection;
-	
 	bool doDrawInfo;
 	
 	ofFbo fbo;
 	ofShader shader;
-	bool doShader;
-		
+	string currentFilter;
 	OMXCameraSettings omxCameraSettings;
+	ofTrueTypeFont font[2];
+
+	ofxOscReceiver receiver;
+
+	string lineOne;
+	string lineTwo;
+
+	ofVideoPlayer vid;
 };
 

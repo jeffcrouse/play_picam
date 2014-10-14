@@ -12,7 +12,7 @@ void ofApp::setup(){
 	omxCameraSettings.width = 640;
 	omxCameraSettings.height = 480;
 	omxCameraSettings.framerate = 30;
-	omxCameraSettings.isUsingTexture = false;
+	omxCameraSettings.isUsingTexture = true;
 
 	videoGrabber.setup(omxCameraSettings);
 	videoGrabber.setFrameStabilization(true);
