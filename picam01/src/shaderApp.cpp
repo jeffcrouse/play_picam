@@ -44,8 +44,8 @@ void shaderApp::setup()
 	receiver.setup(PORT);
 
 	ofLogNotice() << "Loading fonts";
-	font[0].loadFont("verdana.ttf", 120);
-	font[1].loadFont("verdana.ttf", 48);
+	font[0].loadFont("fonts/Lubalin Graph Bold.ttf", 120);
+	font[1].loadFont("fonts/Lubalin Graph Demi Regular.ttf", 32);
 
 	ofLogNotice() << "Listing filters";
 	for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
@@ -131,7 +131,7 @@ void shaderApp::update()
 			}
 		}
 		
-		if(m.getAddress() == "/tumblr") {
+		if(m.getAddress() == "/gif") {
 		}
 	}
 
@@ -159,12 +159,21 @@ void shaderApp::update()
 		
 			box = font[0].getStringBoundingBox(lineOne, 0, 0);
 			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+			ofSetColor(ofColor::black);
+			font[0].drawString(lineOne, x+2, y+2);
+			ofSetColor(ofColor::white);
 			font[0].drawString(lineOne, x, y);
 			
 			y += font[1].getLineHeight()+50;
 			box = font[1].getStringBoundingBox(lineTwo, 0, 0);
 			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+			
+			ofSetColor(ofColor::black);
+			font[1].drawString(lineTwo, x+2, y+2);
+			ofSetColor(ofColor::white);
 			font[1].drawString(lineTwo, x, y);
+
+
 		overlayFbo.end();
 	}
 
