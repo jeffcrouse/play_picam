@@ -9,12 +9,14 @@ void ofApp::setup(){
 
 	//consoleListener.setup(this);
 
-	omxCameraSettings.width = 1024;
-	omxCameraSettings.height = 768;
+	omxCameraSettings.width = 640;
+	omxCameraSettings.height = 480;
 	omxCameraSettings.framerate = 30;
-	omxCameraSettings.isUsingTexture = true;
+	omxCameraSettings.isUsingTexture = false;
 
 	videoGrabber.setup(omxCameraSettings);
+	videoGrabber.setFrameStabilization(true);
+	videoGrabber.setFlickerCancellation(OMX_COMMONFLICKERCANCEL_AUTO);
 
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
@@ -87,8 +89,6 @@ void ofApp::draw(){
 
 		ofPopStyle();
 	}
-
-
 
 }
 
