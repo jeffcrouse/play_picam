@@ -20,6 +20,7 @@ void shaderApp::setup()
 
 	shader.load("shaderExample");
 	
+	ofLogNotice() << "Allocating FBOs";
 	camFbo.allocate(omxCameraSettings.width, omxCameraSettings.height);
 	camFbo.begin();
 		ofClear(0, 0, 0, 0);
@@ -33,20 +34,31 @@ void shaderApp::setup()
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
 
-	font[0].loadFont("verdana.ttf", 150);
-	font[1].loadFont("verdana.ttf", 64);
+	ofLogNotice() << "Loading fonts";
+	font[0].loadFont("verdana.ttf", 120);
+	font[1].loadFont("verdana.ttf", 48);
 
+	ofLogNotice() << "Listing filters";
 	for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
 				it!=OMX_Maps::getInstance().imageFilters.end(); ++it) {
         	ofLogNotice() << (*it).first;
    	}
-		
+
+	ofLogNotice() << "Listing videos";
+	ofDirectory dir;
+	dir.listDir("videos/");
+	for(int i = 0; i < (int)dir.size(); i++){
+		string path = dir.getName(i);
+		ofLogNotice() << path;
+	}
+
+	bVideoPlaying = false;
 }	
 
 //--------------------------------------------------------------
 void shaderApp::update()
 {
-	bool overlayChanged = false;
+	bool textChanged = false;
 
 	// check for waiting messages
 	while(receiver.hasWaitingMessages()){
@@ -56,32 +68,65 @@ void shaderApp::update()
 
 		if(m.getAddress() == "/lineOne"){
 			lineOne = ofToString(m.getArgAsInt32(0));
-			overlayChanged = true;
+			textChanged = true;
 		}
 
 		if(m.getAddress() == "/lineTwo"){
 			lineTwo = m.getArgAsString(0);
-			overlayChanged = true;
+			textChanged = true;
 		}
 
 		if(m.getAddress() == "/filter") {
-			string newName = m.getArgAsString(0);
+			string filterToUse = m.getArgAsString(0);
 			for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
 				it!=OMX_Maps::getInstance().imageFilters.end(); ++it)
 			{
 				string name = (*it).first;
 				OMX_IMAGEFILTERTYPE filter = (*it).second;
 
-				if (name == newName)  {
-					currentFilter = newName;
+				if (name == filterToUse)  {
+					currentFilter = filterToUse;
 					videoGrabber.applyImageFilter(filter);
 				}
 			}
 		}
+		
+		if(m.getAddress() == "/video") {
+			string videoToPlay = m.getArgAsString(0);
+			ofDirectory dir;
+			dir.listDir("videos/");
+			for(int i = 0; i < (int)dir.size(); i++){
+				string name = dir.getName(i);
+				if(name==videoToPlay) {
+					ofLogNotice() << "playing " << name;
+					
+					
+
+					string videoPath = dir.getPath(i);
+					
+					ofxOMXPlayerSettings settings;
+					settings.videoPath = videoPath;
+					settings.useHDMIForAudio = true;	//default true
+					settings.enableTexture = true;		//default true
+					settings.enableLooping = false;		//default true
+					settings.enableAudio = true;		//default true, save resources by disabling
+					//settings.doFlipTexture = true;		//default false
+					
+					//so either pass in the settings
+					omxPlayer.setup(settings);
+					
+					bVideoPlaying = true;
+				}
+				
+			}
+		}
+		
+		if(m.getAddress() == "/tumblr") {
+		}
 	}
 
 
-	if (videoGrabber.isFrameNew())
+	if (videoGrabber.isFrameNew() && !bVideoPlaying)
 	{
 		camFbo.begin();
 		ofClear(0, 0, 0, 0);
@@ -94,23 +139,30 @@ void shaderApp::update()
 		camFbo.end();
 	}
 
-	if(overlayChanged)
+	if(textChanged || bVideoPlaying)
 	{
 		overlayFbo.begin();
 			ofClear(0, 0, 0, 0);
-		
-			ofRectangle box;
-			int x;
-			int y = font[0].getLineHeight()+50;
-		
-			box = font[0].getStringBoundingBox(lineOne, 0, 0);
-			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
-			font[0].drawString(lineOne, x, y);
+			if(bVideoPlaying && omxPlayer.isFrameNew()) {
+				omxPlayer.draw(0, 0, overlayFbo.getWidth(), overlayFbo.getHeight());
 			
-			y += font[1].getLineHeight()+50;
-			box = font[1].getStringBoundingBox(lineTwo, 0, 0);
-			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
-			font[1].drawString(lineTwo, x, y);
+				if(!omxPlayer.isPlaying()) {
+					bVideoPlaying=false;	
+				}
+			} else {
+				ofRectangle box;
+				int x;
+				int y = font[0].getLineHeight()+50;
+			
+				box = font[0].getStringBoundingBox(lineOne, 0, 0);
+				x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+				font[0].drawString(lineOne, x, y);
+				
+				y += font[1].getLineHeight()+50;
+				box = font[1].getStringBoundingBox(lineTwo, 0, 0);
+				x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+				font[1].drawString(lineTwo, x, y);
+			}
 		overlayFbo.end();
 	}
 

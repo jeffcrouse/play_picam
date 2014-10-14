@@ -5,6 +5,7 @@
 #include "ofxRPiCameraVideoGrabber.h"
 #include "OMX_Maps.h"
 #include "ofxOsc.h"
+#include "ofxOMXPlayer.h"
 
 #define PORT 12345
 
@@ -17,10 +18,10 @@ class shaderApp : public ofBaseApp {
 
 	public:
 
-		void setup();
-		void update();
-		void draw();
-		void keyPressed(int key);
+	void setup();
+	void update();
+	void draw();
+	void keyPressed(int key);
 
 	ofxRPiCameraVideoGrabber videoGrabber;
 	bool doDrawInfo;
@@ -28,7 +29,7 @@ class shaderApp : public ofBaseApp {
 	ofFbo camFbo;
 	ofFbo overlayFbo;
 	ofShader shader;
-	string currentFilter;
+
 	OMXCameraSettings omxCameraSettings;
 	ofTrueTypeFont font[2];
 
@@ -37,6 +38,11 @@ class shaderApp : public ofBaseApp {
 	string lineOne;
 	string lineTwo;
 
-	ofVideoPlayer vid;
+	ofxOMXPlayer omxPlayer;
+
+	bool bVideoPlaying;
+
+	string currentFilter;
+	string currentVideo;
 };
 
