@@ -17,7 +17,7 @@ void shaderApp::setup()
 	ofEnableAlphaBlending();
 	ofSetFullscreen(true);
 	
-	doDrawInfo	= true;
+	doDrawInfo = false;
 	
 	OMXCameraSettings omxCameraSettings;
 	omxCameraSettings.width = 640;
@@ -75,13 +75,9 @@ void shaderApp::update()
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
 
-		if(m.getAddress() == "/lineOne"){
+		if(m.getAddress() == "/text"){
 			lineOne = ofToString(m.getArgAsInt32(0));
-			textChanged = true;
-		}
-
-		if(m.getAddress() == "/lineTwo"){
-			lineTwo = m.getArgAsString(0);
+			lineTwo = m.getArgAsString(1);
 			textChanged = true;
 		}
 
@@ -93,13 +89,18 @@ void shaderApp::update()
 				string name = (*it).first;
 				OMX_IMAGEFILTERTYPE filter = (*it).second;
 
-				if (name == filterToUse)  {
+				if (ofToLower(name) == ofToLower(filterToUse))  {
 					currentFilter = filterToUse;
 					videoGrabber.applyImageFilter(filter);
 				}
 			}
 		}
 		
+		if(m.getAddress() == "/info") {
+			int i = m.getArgAsInt32(0);
+			doDrawInfo = i;
+		}
+
 		if(m.getAddress() == "/video") {
 			string videoToPlay = m.getArgAsString(0);
 			ofDirectory dir;
