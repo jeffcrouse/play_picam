@@ -118,11 +118,13 @@ void shaderApp::update()
 					settings.enableTexture = true;		//default true
 					settings.enableLooping = false;		//default true
 					settings.enableAudio = true;		//default true, save resources by disabling
+					settings.listener = this;
 					//settings.doFlipTexture = true;		//default false
 					
 					//so either pass in the settings
 					omxPlayer.setup(settings);
 					
+					currentVideo = name;
 					bVideoPlaying = true;
 				}
 			}
@@ -186,6 +188,8 @@ void shaderApp::draw(){
 	info << "APP FPS: " << ofGetFrameRate() << "\n";
 	info << "Camera Resolution: " << videoGrabber.getWidth() << "x" << videoGrabber.getHeight()	<< " @ "<< videoGrabber.getFrameRate() <<"FPS"<< "\n";
 	info << "CURRENT FILTER: " << currentFilter << "\n";
+	info << "CURRENT VIDEO: " << currentVideo << " ";
+	info << "(" << omxPlayer.getCurrentFrame() << "/" << omxPlayer.getTotalNumFrames() << ")" << endl;
 
 	if (doDrawInfo) 
 	{
