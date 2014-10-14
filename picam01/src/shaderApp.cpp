@@ -131,7 +131,14 @@ void shaderApp::update()
 			}
 		}
 		
-		if(m.getAddress() == "/gif") {
+		if(m.getAddress() == "/image") {
+			string url = m.getArgAsString(0);
+			vector<string> pieces = ofSplitString(url, "/");
+			int len = pieces.size();
+			string path = ofToDataPath("images/"+pieces[len-1]);
+			ofLogNotice() << "Saving " << url << " to " << path;
+			ofSaveURLTo(url, path);
+			
 		}
 	}
 
