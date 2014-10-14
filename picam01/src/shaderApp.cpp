@@ -11,6 +11,7 @@ void shaderApp::setup()
 	
 	doDrawInfo	= true;
 	
+	OMXCameraSettings omxCameraSettings;
 	omxCameraSettings.width = 640;
 	omxCameraSettings.height = 480;
 	omxCameraSettings.framerate = 30;
@@ -99,8 +100,6 @@ void shaderApp::update()
 				string name = dir.getName(i);
 				if(name==videoToPlay) {
 					ofLogNotice() << "playing " << name;
-					
-					
 
 					string videoPath = dir.getPath(i);
 					
@@ -117,7 +116,6 @@ void shaderApp::update()
 					
 					bVideoPlaying = true;
 				}
-				
 			}
 		}
 		
@@ -139,40 +137,42 @@ void shaderApp::update()
 		camFbo.end();
 	}
 
-	if(textChanged || bVideoPlaying)
+	if(textChanged)
 	{
 		overlayFbo.begin();
 			ofClear(0, 0, 0, 0);
-			if(bVideoPlaying && omxPlayer.isFrameNew()) {
-				omxPlayer.draw(0, 0, overlayFbo.getWidth(), overlayFbo.getHeight());
+			ofRectangle box;
+			int x;
+			int y = font[0].getLineHeight()+50;
+		
+			box = font[0].getStringBoundingBox(lineOne, 0, 0);
+			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+			font[0].drawString(lineOne, x, y);
 			
-				if(!omxPlayer.isPlaying()) {
-					bVideoPlaying=false;	
-				}
-			} else {
-				ofRectangle box;
-				int x;
-				int y = font[0].getLineHeight()+50;
-			
-				box = font[0].getStringBoundingBox(lineOne, 0, 0);
-				x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
-				font[0].drawString(lineOne, x, y);
-				
-				y += font[1].getLineHeight()+50;
-				box = font[1].getStringBoundingBox(lineTwo, 0, 0);
-				x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
-				font[1].drawString(lineTwo, x, y);
-			}
+			y += font[1].getLineHeight()+50;
+			box = font[1].getStringBoundingBox(lineTwo, 0, 0);
+			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
+			font[1].drawString(lineTwo, x, y);
 		overlayFbo.end();
 	}
 
+	if(!omxPlayer.isPlaying()) {
+		bVideoPlaying=false;	
+	}
 }
 
 
 //--------------------------------------------------------------
 void shaderApp::draw(){
 	
-	camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());		
+
+	if(bVideoPlaying) {
+		omxPlayer.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+	} else {
+		camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());	
+	}
+	
 	overlayFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
 
 
@@ -184,14 +184,5 @@ void shaderApp::draw(){
 	if (doDrawInfo) 
 	{
 		ofDrawBitmapStringHighlight(info.str(), 100, 100, ofColor::black, ofColor::yellow);
-	}
-
-	
-}
-
-//--------------------------------------------------------------
-void shaderApp::keyPressed  (int key)
-{
-	ofLogVerbose(__func__) << key;
-
+	}	
 }

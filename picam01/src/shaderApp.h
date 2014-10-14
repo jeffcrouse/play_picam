@@ -9,11 +9,6 @@
 
 #define PORT 12345
 
-struct TextLine {
-	string text;
-	ofColor color;
-};
-
 class shaderApp : public ofBaseApp {
 
 	public:
@@ -21,7 +16,6 @@ class shaderApp : public ofBaseApp {
 	void setup();
 	void update();
 	void draw();
-	void keyPressed(int key);
 
 	ofxRPiCameraVideoGrabber videoGrabber;
 	bool doDrawInfo;
@@ -30,7 +24,7 @@ class shaderApp : public ofBaseApp {
 	ofFbo overlayFbo;
 	ofShader shader;
 
-	OMXCameraSettings omxCameraSettings;
+	
 	ofTrueTypeFont font[2];
 
 	ofxOscReceiver receiver;
