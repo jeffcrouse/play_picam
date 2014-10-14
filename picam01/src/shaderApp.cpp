@@ -155,12 +155,15 @@ void shaderApp::update()
 				if(ofFile::doesFileExist(path, false)==false) {
 					ofLogNotice() << "Saving " << url << " to " << path;
 					ofSaveURLTo(url, path);
+				} else {
+					ofLogNotice() << name << "Already exists!";
 				}
 
 				gifFrame = 0;
 				
+				ofLogNotice() << "loading " << path;
 				gifLoader.load(path);
-				gifAdvanceFrame = ofGetElapsedTimef() + gifFrameRate;
+				gifAdvanceFrame = now-1;
 
 				currentImage = name;
 				displayMode = MODE_IMAGE;
@@ -169,7 +172,7 @@ void shaderApp::update()
 	}
 
 
-	if (videoGrabber.isFrameNew() && displayMode == MODE_CAMERA)
+	if (displayMode == MODE_CAMERA && videoGrabber.isFrameNew())
 	{
 		camFbo.begin();
 		ofClear(0, 0, 0, 0);
@@ -213,14 +216,26 @@ void shaderApp::update()
 		overlayFbo.end();
 	}
 
-	if(displayMode==MODE_IMAGE) {
+	if(displayMode==MODE_IMAGE && now > gifAdvanceFrame) {
+		ofLogNotice() << "Advancing GIF frame";
+		gifFrame = (gifFrame+1) % gifLoader.pages.size();
 		
-		if(now > gifAdvanceFrame) {
-			gifFrame = (gifFrame+1) % gifLoader.pages.size();
-			gifAdvanceFrame = now + gifFrameRate;
+		int w = gifLoader.pages[gifFrame].getWidth();
+		int h = gifLoader.pages[gifFrame].getHeight();
+
+		if(h > w) {
+			gifBounds.height = ofGetHeight();
+			gifBounds.width = (ofGetHeight()/h) * w;
+		} else {
+			gifBounds.width = ofGetWidth();
+			gifBounds.height = (ofGetWidth()/w) * h;
 		}
-		gifBounds.width = gifLoader.pages[gifFrame].getWidth();
-		gifBounds.height = gifLoader.pages[gifFrame].getHeight();
+
+		gifBounds.x = (ofGetWidth()/2.0) - (gifBounds.width/2.0);
+		gifBounds.y = (ofGetHeight()/2.0) - (gifBounds.height/2.0);
+		
+		gifAdvanceFrame = now + gifFrameRate;
+
 	}
 
 }
