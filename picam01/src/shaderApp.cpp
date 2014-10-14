@@ -1,10 +1,16 @@
 #include "shaderApp.h"
 
+
+bool ofxStringEndsWith(string &str, string& key) {
+    size_t i = str.rfind(key);
+    return (i != string::npos) && (i == (str.length() - key.length()));
+}
+
 //--------------------------------------------------------------
 void shaderApp::onVideoEnd(ofxOMXPlayerListenerEventData& e)
 {
 	ofLogVerbose(__func__) << " RECEIVED";
-	bVideoPlaying=false;
+	displayMode = MODE_CAMERA;
 }
 
 
@@ -61,7 +67,9 @@ void shaderApp::setup()
 		ofLogNotice() << path;
 	}
 
-	bVideoPlaying = false;
+	gifFrame = 0;
+	frameRate = 0.5;
+	displayMode = MODE_CAMERA;
 }	
 
 //--------------------------------------------------------------
@@ -126,19 +134,27 @@ void shaderApp::update()
 					omxPlayer.setup(settings);
 					
 					currentVideo = name;
-					bVideoPlaying = true;
+					displayMode = MOVE_VIDEO;
 				}
 			}
 		}
 		
 		if(m.getAddress() == "/image") {
 			string url = m.getArgAsString(0);
-			vector<string> pieces = ofSplitString(url, "/");
-			int len = pieces.size();
-			string path = ofToDataPath("images/"+pieces[len-1]);
-			ofLogNotice() << "Saving " << url << " to " << path;
-			ofSaveURLTo(url, path);
-			
+
+			if(ofxStringEndsWith(url, "gif")) {
+				
+				vector<string> pieces = ofSplitString(url, "/");
+				int len = pieces.size();
+				string path = ofToDataPath("images/"+pieces[len-1]);
+				ofLogNotice() << "Saving " << url << " to " << path;
+				ofSaveURLTo(url, path);
+
+				gifFrame = 0;
+				gifloader.load(path);
+				gifAdvanceFrame = ofGetElapsedTimef() + gif_frameRate;
+				displayMode = MODE_IMAGE;
+			}
 		}
 	}
 
@@ -189,13 +205,22 @@ void shaderApp::update()
 
 //--------------------------------------------------------------
 void shaderApp::draw(){
-	
+	float now = ofGetElapsedTimef();
 
-	if(bVideoPlaying) {
+	switch(displayMode) {
+	case MODE_CAMERA:
+		camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+		break;
+	case MODE_VIDEO:
 		omxPlayer.draw(0, 0, ofGetWidth(), ofGetHeight());
-
-	} else {
-		camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());	
+		break;
+	case MODE_IMAGE:
+		if(now > gifAdvanceFrame) {
+			gifFrame = (gifFrame+1) % gifLoader.pages.size();
+			gifAdvanceFrame = ofGetElapsedTimef() + gifFrameRate;
+		}
+		gifLoader.pages[gif_frame].draw(0, 0, ofGetWidth(), ofGetHeight());
+		break;
 	}
 	
 	overlayFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
