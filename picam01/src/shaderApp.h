@@ -46,8 +46,9 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 
 	string currentFilter;
 	string currentVideo;
-	
-	ofxGIF::fiGifLoader gifloader;
+	string currentImage;
+
+	ofxGIF::fiGifLoader gifLoader;
 	int gifFrame;
 	float gifFrameRate;
 	float gifAdvanceFrame;

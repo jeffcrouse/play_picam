@@ -68,7 +68,9 @@ void shaderApp::setup()
 	}
 
 	gifFrame = 0;
-	frameRate = 0.5;
+	gifFrameRate = 0.5;
+
+	
 	displayMode = MODE_CAMERA;
 }	
 
@@ -134,32 +136,37 @@ void shaderApp::update()
 					omxPlayer.setup(settings);
 					
 					currentVideo = name;
-					displayMode = MOVE_VIDEO;
+					displayMode = MODE_VIDEO;
 				}
 			}
 		}
 		
 		if(m.getAddress() == "/image") {
 			string url = m.getArgAsString(0);
-
-			if(ofxStringEndsWith(url, "gif")) {
+			string gif = "gif";
+			if(ofxStringEndsWith(url, gif)) {
 				
 				vector<string> pieces = ofSplitString(url, "/");
 				int len = pieces.size();
-				string path = ofToDataPath("images/"+pieces[len-1]);
+				string name = pieces[len-1];
+				string path = ofToDataPath("images/"+name);
+				
 				ofLogNotice() << "Saving " << url << " to " << path;
 				ofSaveURLTo(url, path);
 
 				gifFrame = 0;
-				gifloader.load(path);
-				gifAdvanceFrame = ofGetElapsedTimef() + gif_frameRate;
+				
+				gifLoader.load(path);
+				gifAdvanceFrame = ofGetElapsedTimef() + gifFrameRate;
+
+				currentImage = name;
 				displayMode = MODE_IMAGE;
 			}
 		}
 	}
 
 
-	if (videoGrabber.isFrameNew() && !bVideoPlaying)
+	if (videoGrabber.isFrameNew() && displayMode == MODE_VIDEO)
 	{
 		camFbo.begin();
 		ofClear(0, 0, 0, 0);
@@ -175,6 +182,7 @@ void shaderApp::update()
 	if(textChanged)
 	{
 		overlayFbo.begin();
+
 			ofClear(0, 0, 0, 0);
 			ofRectangle box;
 			int x;
@@ -187,10 +195,12 @@ void shaderApp::update()
 			ofSetColor(ofColor::white);
 			font[0].drawString(lineOne, x, y);
 			
+
 			y += font[1].getLineHeight()+50;
+
+
 			box = font[1].getStringBoundingBox(lineTwo, 0, 0);
 			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
-			
 			ofSetColor(ofColor::black);
 			font[1].drawString(lineTwo, x+2, y+2);
 			ofSetColor(ofColor::white);
@@ -205,6 +215,8 @@ void shaderApp::update()
 
 //--------------------------------------------------------------
 void shaderApp::draw(){
+	ofBackground(0);
+
 	float now = ofGetElapsedTimef();
 
 	switch(displayMode) {
@@ -219,7 +231,10 @@ void shaderApp::draw(){
 			gifFrame = (gifFrame+1) % gifLoader.pages.size();
 			gifAdvanceFrame = ofGetElapsedTimef() + gifFrameRate;
 		}
-		gifLoader.pages[gif_frame].draw(0, 0, ofGetWidth(), ofGetHeight());
+		int width = gifLoader.pages[gifFrame].getWidth();
+		int height = gifLoader.pages[gifFrame].getHeight();
+		
+		gifLoader.pages[gifFrame].draw(0, 0, ofGetWidth(), ofGetHeight());
 		break;
 	}
 	
@@ -232,6 +247,7 @@ void shaderApp::draw(){
 	info << "CURRENT FILTER: " << currentFilter << "\n";
 	info << "CURRENT VIDEO: " << currentVideo << " ";
 	info << "(" << omxPlayer.getCurrentFrame() << "/" << omxPlayer.getTotalNumFrames() << ")" << endl;
+	info << "CURRENT IMAGE: " << currentImage << endl;
 
 	if (doDrawInfo) 
 	{
