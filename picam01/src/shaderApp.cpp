@@ -1,9 +1,17 @@
 #include "shaderApp.h"
 
 //--------------------------------------------------------------
+void shaderApp::onVideoEnd(ofxOMXPlayerListenerEventData& e)
+{
+	ofLogVerbose(__func__) << " RECEIVED";
+	bVideoPlaying=false;
+}
+
+
+//--------------------------------------------------------------
 void shaderApp::setup()
 {
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	//ofSetLogLevel(OF_LOG_VERBOSE);
 	ofSetLogLevel("ofThread", OF_LOG_SILENT);
 	ofSetVerticalSync(false);
 	ofEnableAlphaBlending();
@@ -96,12 +104,13 @@ void shaderApp::update()
 			string videoToPlay = m.getArgAsString(0);
 			ofDirectory dir;
 			dir.listDir("videos/");
+
 			for(int i = 0; i < (int)dir.size(); i++){
 				string name = dir.getName(i);
 				if(name==videoToPlay) {
-					ofLogNotice() << "playing " << name;
+					ofLogNotice("!!!") << "playing " << name;
 
-					string videoPath = dir.getPath(i);
+					string videoPath = ofToDataPath(dir.getPath(i), true);
 					
 					ofxOMXPlayerSettings settings;
 					settings.videoPath = videoPath;
@@ -156,9 +165,6 @@ void shaderApp::update()
 		overlayFbo.end();
 	}
 
-	if(!omxPlayer.isPlaying()) {
-		bVideoPlaying=false;	
-	}
 }
 
 

@@ -9,13 +9,16 @@
 
 #define PORT 12345
 
-class shaderApp : public ofBaseApp {
+class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 
 	public:
 
 	void setup();
 	void update();
 	void draw();
+	
+	void onVideoEnd(ofxOMXPlayerListenerEventData& e);
+	void onVideoLoop(ofxOMXPlayerListenerEventData& e){ /*empty*/ };
 
 	ofxRPiCameraVideoGrabber videoGrabber;
 	bool doDrawInfo;
