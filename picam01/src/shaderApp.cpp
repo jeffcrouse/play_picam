@@ -23,7 +23,7 @@ void shaderApp::setup()
 	ofEnableAlphaBlending();
 	ofSetFullscreen(true);
 	
-	doDrawInfo = true;
+	doDrawInfo = false;
 	
 	OMXCameraSettings omxCameraSettings;
 	omxCameraSettings.width = 640;
@@ -162,7 +162,10 @@ void shaderApp::update()
 				gifFrame = 0;
 				
 				ofLogNotice() << "loading " << path;
-				gifLoader.load(path);
+				decoder.decode(path);
+				file = decoder.getFile();
+				ofLogNotice() << "done!";
+
 				gifAdvanceFrame = now-1;
 
 				currentImage = name;
@@ -217,11 +220,14 @@ void shaderApp::update()
 	}
 
 	if(displayMode==MODE_IMAGE && now > gifAdvanceFrame) {
-		ofLogNotice() << "Advancing GIF frame";
+
+		
 		gifFrame = (gifFrame+1) % gifLoader.pages.size();
 		
-		int w = gifLoader.pages[gifFrame].getWidth();
-		int h = gifLoader.pages[gifFrame].getHeight();
+		ofLogNotice() << "Advancing GIF frame ("<< gifFrame << "/" << gifLoader.pages.size() << ")";
+
+		int w = file.getWidth();
+		int h = file.getHeight();
 
 		if(h > w) {
 			gifBounds.height = ofGetHeight();
@@ -255,7 +261,8 @@ void shaderApp::draw(){
 			break;
 
 		case MODE_IMAGE:
-			gifLoader.pages[gifFrame].draw(gifBounds);
+			file.drawFrame(gifFrame, gifBounds.x, gifBounds.y, gifBounds.width, gifBounds.height);
+			//gifLoader.pages[gifFrame].draw(gifBounds);
 			break;
 		default:
 			ofLogWarning() << "INVALID DISPLAY MODE!";
