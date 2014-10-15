@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6B591A1D-E2A9-4512-9582-AE8589FD5060</string>
+	<key>IDESourceControlProjectName</key>
+	<string>giftest</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>0A100AB603CADB75C73679E385A69EDF78003AB8</key>
+		<string>https://github.com/odddivision/play_picam.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>giftest/giftest.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>0A100AB603CADB75C73679E385A69EDF78003AB8</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/odddivision/play_picam.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>0A100AB603CADB75C73679E385A69EDF78003AB8</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>0A100AB603CADB75C73679E385A69EDF78003AB8</string>
+			<key>IDESourceControlWCCName</key>
+			<string>play_picam</string>
+		</dict>
+	</array>
+</dict>
+</plist>

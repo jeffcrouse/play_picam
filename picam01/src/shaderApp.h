@@ -11,7 +11,6 @@
 
 #define MODE_CAMERA 1
 #define MODE_VIDEO 2
-#define MODE_GIF 3
 
 class shaderApp : public ofBaseApp, public ofxOMXPlayerListener, public ofThread {
 
@@ -25,7 +24,7 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener, public ofThread
 	void onVideoEnd(ofxOMXPlayerListenerEventData& e);
 	void onVideoLoop(ofxOMXPlayerListenerEventData& e){ /*empty*/ };
 
-	void loadGIF(string url);
+	//void loadGIF(string url);
 
 	ofxRPiCameraVideoGrabber videoGrabber;
 	bool doDrawInfo;
@@ -47,6 +46,6 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener, public ofThread
 
 	string currentFilter;
 	string currentVideo;
-	string currentImage;
+	//string currentImage;
 };
 

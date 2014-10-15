@@ -131,10 +131,10 @@ void shaderApp::update()
 			}
 		}
 		
-		if(m.getAddress() == "/gif") {
-			string url = m.getArgAsString(0);
-			loadGIF(url);
-		}
+//		if(m.getAddress() == "/gif") {
+//			string url = m.getArgAsString(0);
+//			loadGIF(url);
+//		}
 	}
 
 	if(textChanged)
@@ -210,6 +210,7 @@ void shaderApp::update()
 
 }
 
+/*
 //--------------------------------------------------------------
 void shaderApp::loadGIF(string url) {
 	string gif = "gif";
@@ -234,9 +235,9 @@ void shaderApp::loadGIF(string url) {
 
 	currentImage = name;
 	displayMode = MODE_GIF;
-
-
 }
+*/
+
 
 //--------------------------------------------------------------
 void shaderApp::threadedFunction() {
@@ -261,10 +262,6 @@ void shaderApp::draw(){
 			omxPlayer.draw(0, 0, ofGetWidth(), ofGetHeight());
 			break;
 
-		case MODE_IMAGE:
-
-			break;
-
 		default:
 			ofLogWarning() << "INVALID DISPLAY MODE!";
 			break;
@@ -279,7 +276,7 @@ void shaderApp::draw(){
 	info << "CURRENT FILTER: " << currentFilter << "\n";
 	info << "CURRENT VIDEO: " << currentVideo << " ";
 	info << "(" << omxPlayer.getCurrentFrame() << "/" << omxPlayer.getTotalNumFrames() << ")" << endl;
-	info << "CURRENT IMAGE: " << currentImage << endl;
+	//info << "CURRENT IMAGE: " << currentImage << endl;
 	info << "DISPLAY MODE: " << displayMode << endl;
 	if (doDrawInfo) 
 	{
