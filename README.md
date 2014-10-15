@@ -36,6 +36,8 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 	1. `sudo reboot`
 1. [Set up Bonjour/ZeroConf for easy access on network](http://www.raspberrypi.org/forums/viewtopic.php?f=66&t=18207)
 	1. sudo apt-get install libnss-mdns
+1. Set up AFP (for file sharing with Macs)
+	1. `sudo apt-get install netatalk`
 1. Use "WiFi Config" to set up wireless
 1. [Raspberry Pi - Getting Started (openFrameworks)](http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html)
 	1. `cd`

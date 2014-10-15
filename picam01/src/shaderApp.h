@@ -11,18 +11,21 @@
 
 #define MODE_CAMERA 1
 #define MODE_VIDEO 2
-#define MODE_IMAGE 3
+#define MODE_GIF 3
 
-class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
+class shaderApp : public ofBaseApp, public ofxOMXPlayerListener, public ofThread {
 
 	public:
 
 	void setup();
 	void update();
 	void draw();
-	
+	void threadedFunction();
+
 	void onVideoEnd(ofxOMXPlayerListenerEventData& e);
 	void onVideoLoop(ofxOMXPlayerListenerEventData& e){ /*empty*/ };
+
+	void loadGIF(string url);
 
 	ofxRPiCameraVideoGrabber videoGrabber;
 	bool doDrawInfo;
@@ -31,7 +34,6 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 	ofFbo overlayFbo;
 	ofShader shader;
 
-	
 	ofTrueTypeFont font[2];
 
 	ofxOscReceiver receiver;
@@ -46,11 +48,5 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 	string currentFilter;
 	string currentVideo;
 	string currentImage;
-
-
-	int gifFrame;
-	float gifFrameRate;
-	float gifAdvanceFrame;
-	ofRectangle gifBounds;
 };
 

@@ -1,18 +1,6 @@
 #include "shaderApp.h"
 
 
-bool ofxStringEndsWith(string &str, string& key) {
-    size_t i = str.rfind(key);
-    return (i != string::npos) && (i == (str.length() - key.length()));
-}
-
-//--------------------------------------------------------------
-void shaderApp::onVideoEnd(ofxOMXPlayerListenerEventData& e)
-{
-	ofLogVerbose(__func__) << " RECEIVED";
-	displayMode = MODE_CAMERA;
-}
-
 
 //--------------------------------------------------------------
 void shaderApp::setup()
@@ -35,6 +23,7 @@ void shaderApp::setup()
 
 	shader.load("shaderExample");
 	
+
 	ofLogNotice() << "Allocating FBOs";
 	camFbo.allocate(omxCameraSettings.width, omxCameraSettings.height);
 	camFbo.begin();
@@ -46,16 +35,19 @@ void shaderApp::setup()
 		ofClear(0, 0, 0, 0);
 	overlayFbo.end();
 
-	cout << "listening for osc messages on port " << PORT << "\n";
+
+	ofLogNotice() << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
+
 
 	ofLogNotice() << "Loading fonts";
 	font[0].loadFont("fonts/Lubalin Graph Bold.ttf", 120);
 	font[1].loadFont("fonts/Lubalin Graph Demi Regular.ttf", 32);
 
 	ofLogNotice() << "Listing filters";
-	for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
-				it!=OMX_Maps::getInstance().imageFilters.end(); ++it) {
+	map<string, OMX_IMAGEFILTERTYPE>::iterator it;
+	for(it = OMX_Maps::getInstance().imageFilters.begin();
+			it!=OMX_Maps::getInstance().imageFilters.end(); ++it) {
         	ofLogNotice() << (*it).first;
    	}
 
@@ -67,10 +59,6 @@ void shaderApp::setup()
 		ofLogNotice() << path;
 	}
 
-	gifFrame = 0;
-	gifFrameRate = 0.5;
-
-	
 	displayMode = MODE_CAMERA;
 }	
 
@@ -94,9 +82,9 @@ void shaderApp::update()
 
 		if(m.getAddress() == "/filter") {
 			string filterToUse = m.getArgAsString(0);
-			for(map<string, OMX_IMAGEFILTERTYPE>::iterator it = OMX_Maps::getInstance().imageFilters.begin();
-				it!=OMX_Maps::getInstance().imageFilters.end(); ++it)
-			{
+			map<string, OMX_IMAGEFILTERTYPE>::iterator it;
+			for(it = OMX_Maps::getInstance().imageFilters.begin();
+				it!=OMX_Maps::getInstance().imageFilters.end(); ++it) {
 				string name = (*it).first;
 				OMX_IMAGEFILTERTYPE filter = (*it).second;
 
@@ -113,13 +101,14 @@ void shaderApp::update()
 		}
 
 		if(m.getAddress() == "/video") {
+			
 			string videoToPlay = m.getArgAsString(0);
 			ofDirectory dir;
 			dir.listDir("videos/");
 
 			for(int i = 0; i < (int)dir.size(); i++){
 				string name = dir.getName(i);
-				if(name==videoToPlay) {
+				if(name == videoToPlay) {
 					ofLogNotice("!!!") << "playing " << name;
 
 					string videoPath = ofToDataPath(dir.getPath(i), true);
@@ -142,49 +131,10 @@ void shaderApp::update()
 			}
 		}
 		
-		if(m.getAddress() == "/image") {
+		if(m.getAddress() == "/gif") {
 			string url = m.getArgAsString(0);
-			string gif = "gif";
-			if(ofxStringEndsWith(url, gif)) {
-				
-				vector<string> pieces = ofSplitString(url, "/");
-				int len = pieces.size();
-				string name = pieces[len-1];
-				string path = ofToDataPath("images/"+name);
-				
-				if(ofFile::doesFileExist(path, false)==false) {
-					ofLogNotice() << "Saving " << url << " to " << path;
-					ofSaveURLTo(url, path);
-				} else {
-					ofLogNotice() << name << "Already exists!";
-				}
-
-				gifFrame = 0;
-				
-				ofLogNotice() << "loading " << path;
-				
-				ofLogNotice() << "done!";
-
-				gifAdvanceFrame = now-1;
-
-				currentImage = name;
-				displayMode = MODE_IMAGE;
-			}
+			loadGIF(url);
 		}
-	}
-
-
-	if (displayMode == MODE_CAMERA && videoGrabber.isFrameNew())
-	{
-		camFbo.begin();
-		ofClear(0, 0, 0, 0);
-		shader.begin();
-			shader.setUniformTexture("tex0", videoGrabber.getTextureReference(), videoGrabber.getTextureID());
-			shader.setUniform1f("time", ofGetElapsedTimef());
-			shader.setUniform2f("resolution", videoGrabber.getWidth(), videoGrabber.getHeight());
-			videoGrabber.draw();
-		shader.end();
-		camFbo.end();
 	}
 
 	if(textChanged)
@@ -214,11 +164,25 @@ void shaderApp::update()
 			ofSetColor(ofColor::white);
 			font[1].drawString(lineTwo, x, y);
 
-
 		overlayFbo.end();
 	}
 
-	if(displayMode==MODE_IMAGE && now > gifAdvanceFrame) {
+
+	if (displayMode == MODE_CAMERA && videoGrabber.isFrameNew())
+	{
+		camFbo.begin();
+		ofClear(0, 0, 0, 0);
+		shader.begin();
+			shader.setUniformTexture("tex0", videoGrabber.getTextureReference(), videoGrabber.getTextureID());
+			shader.setUniform1f("time", ofGetElapsedTimef());
+			shader.setUniform2f("resolution", videoGrabber.getWidth(), videoGrabber.getHeight());
+			videoGrabber.draw();
+		shader.end();
+		camFbo.end();
+	}
+
+	/*
+	if(displayMode==MODE_GIF && now > gifAdvanceFrame) {
 
 		int totalFrames = 10;
 		gifFrame = (gifFrame+1) % totalFrames;
@@ -242,9 +206,47 @@ void shaderApp::update()
 		gifAdvanceFrame = now + gifFrameRate;
 
 	}
+	*/
 
 }
 
+//--------------------------------------------------------------
+void shaderApp::loadGIF(string url) {
+	string gif = "gif";
+	if(ofxStringEndsWith(url, gif)==false) {
+		return;
+	}
+
+	vector<string> pieces = ofSplitString(url, "/");
+	int len = pieces.size();
+	string name = pieces[len-1];
+	string path = ofToDataPath("images/"+name);
+
+		
+	if(ofFile::doesFileExist(path, false)==false) {
+		ofLogNotice() << "Saving " << url << " to " << path;
+		ofSaveURLTo(url, path);
+
+	} else {
+		ofLogNotice() << name << "Already exists!";
+	}
+
+
+	currentImage = name;
+	displayMode = MODE_GIF;
+
+
+}
+
+//--------------------------------------------------------------
+void shaderApp::threadedFunction() {
+	if(lock()) {
+		
+
+		
+		unlock();
+	}
+}
 
 //--------------------------------------------------------------
 void shaderApp::draw(){
@@ -262,6 +264,7 @@ void shaderApp::draw(){
 		case MODE_IMAGE:
 
 			break;
+
 		default:
 			ofLogWarning() << "INVALID DISPLAY MODE!";
 			break;
@@ -282,4 +285,31 @@ void shaderApp::draw(){
 	{
 		ofDrawBitmapStringHighlight(info.str(), 100, 100, ofColor::black, ofColor::yellow);
 	}	
+}
+
+//--------------------------------------------------------------
+bool ofxStringEndsWith(string &str, string& key) {
+    size_t i = str.rfind(key);
+    return (i != string::npos) && (i == (str.length() - key.length()));
+}
+
+//--------------------------------------------------------------
+void shaderApp::onVideoEnd(ofxOMXPlayerListenerEventData& e) {
+	ofLogVerbose(__func__) << " RECEIVED";
+	displayMode = MODE_CAMERA;
+}
+
+//--------------------------------------------------------------
+string ofxSystemCall(string command) {
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    string result = "";
+    while(!feof(pipe)) {
+        if(fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
+    }
+    pclose(pipe);
+    result.erase(remove(result.begin(), result.end(), '\n'), result.end());
+    return result;
 }
