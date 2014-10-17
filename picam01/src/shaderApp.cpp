@@ -41,8 +41,8 @@ void shaderApp::setup()
 
 
 	ofLogNotice() << "Loading fonts";
-	font[0].loadFont("fonts/Lubalin Graph Bold.ttf", 120);
-	font[1].loadFont("fonts/Lubalin Graph Demi Regular.ttf", 32);
+	font[0].loadFont("fonts/Neue Helvetica/HelveticaNeueLTCom-Bd.ttf", 120);
+	font[1].loadFont("fonts/Neue Helvetica/HelveticaNeueLTCom-Md.ttf", 32);
 
 	ofLogNotice() << "Listing filters";
 	map<string, OMX_IMAGEFILTERTYPE>::iterator it;
