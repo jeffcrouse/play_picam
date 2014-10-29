@@ -1,6 +1,6 @@
 #include "shaderApp.h"
 
-
+#define VIDEO_DIRECTORY "/home/pi/play_videos/"
 
 //--------------------------------------------------------------
 void shaderApp::setup()
@@ -53,7 +53,7 @@ void shaderApp::setup()
 
 	ofLogNotice() << "Listing videos";
 	ofDirectory dir;
-	dir.listDir("videos/");
+	dir.listDir(VIDEO_DIRECTORY);
 	for(int i = 0; i < (int)dir.size(); i++){
 		string path = dir.getName(i);
 		ofLogNotice() << path;
@@ -62,10 +62,32 @@ void shaderApp::setup()
 	displayMode = MODE_CAMERA;
 }	
 
+
+//--------------------------------------------------------------
+void shaderApp::randomVideo() {
+	ofDirectory dir;
+	dir.listDir(VIDEO_DIRECTORY);
+	int n = ofRandom(0, (int)dir.size());
+	string videoPath = dir.getPath(n);
+	string videoName = dir.getName(n);
+
+	ofxOMXPlayerSettings settings;
+	settings.videoPath = videoPath;
+	settings.useHDMIForAudio = true;	//default true
+	settings.enableTexture = true;		//default true
+	settings.enableLooping = false;		//default true
+	settings.enableAudio = true;		//default true, save resources by disabling
+	settings.listener = this;
+	omxPlayer.setup(settings);
+
+	currentVideo = videoName;
+	displayMode = MODE_VIDEO;
+}
+
 //--------------------------------------------------------------
 void shaderApp::update()
 {
-	float now = ofGetElapsedTimef();
+	//float now = ofGetElapsedTimef();
 	bool textChanged = false;
 
 	// check for waiting messages
@@ -101,34 +123,7 @@ void shaderApp::update()
 		}
 
 		if(m.getAddress() == "/video") {
-			
-			string videoToPlay = m.getArgAsString(0);
-			ofDirectory dir;
-			dir.listDir("videos/");
-
-			for(int i = 0; i < (int)dir.size(); i++){
-				string name = dir.getName(i);
-				if(name == videoToPlay) {
-					ofLogNotice("!!!") << "playing " << name;
-
-					string videoPath = ofToDataPath(dir.getPath(i), true);
-					
-					ofxOMXPlayerSettings settings;
-					settings.videoPath = videoPath;
-					settings.useHDMIForAudio = true;	//default true
-					settings.enableTexture = true;		//default true
-					settings.enableLooping = false;		//default true
-					settings.enableAudio = true;		//default true, save resources by disabling
-					settings.listener = this;
-					//settings.doFlipTexture = true;		//default false
-					
-					//so either pass in the settings
-					omxPlayer.setup(settings);
-					
-					currentVideo = name;
-					displayMode = MODE_VIDEO;
-				}
-			}
+			randomVideo();
 		}
 		
 //		if(m.getAddress() == "/gif") {
@@ -181,72 +176,6 @@ void shaderApp::update()
 		camFbo.end();
 	}
 
-	/*
-	if(displayMode==MODE_GIF && now > gifAdvanceFrame) {
-
-		int totalFrames = 10;
-		gifFrame = (gifFrame+1) % totalFrames;
-		
-		ofLogNotice() << "Advancing GIF frame ("<< gifFrame << "/" << totalFrames << ")";
-
-		int w = 0; //file.getWidth();
-		int h = 0; //file.getHeight();
-
-		if(h > w) {
-			gifBounds.height = ofGetHeight();
-			gifBounds.width = (ofGetHeight()/h) * w;
-		} else {
-			gifBounds.width = ofGetWidth();
-			gifBounds.height = (ofGetWidth()/w) * h;
-		}
-
-		gifBounds.x = (ofGetWidth()/2.0) - (gifBounds.width/2.0);
-		gifBounds.y = (ofGetHeight()/2.0) - (gifBounds.height/2.0);
-		
-		gifAdvanceFrame = now + gifFrameRate;
-
-	}
-	*/
-
-}
-
-/*
-//--------------------------------------------------------------
-void shaderApp::loadGIF(string url) {
-	string gif = "gif";
-	if(ofxStringEndsWith(url, gif)==false) {
-		return;
-	}
-
-	vector<string> pieces = ofSplitString(url, "/");
-	int len = pieces.size();
-	string name = pieces[len-1];
-	string path = ofToDataPath("images/"+name);
-
-		
-	if(ofFile::doesFileExist(path, false)==false) {
-		ofLogNotice() << "Saving " << url << " to " << path;
-		ofSaveURLTo(url, path);
-
-	} else {
-		ofLogNotice() << name << "Already exists!";
-	}
-
-
-	currentImage = name;
-	displayMode = MODE_GIF;
-}
-*/
-
-
-//--------------------------------------------------------------
-void shaderApp::threadedFunction() {
-	if(lock()) {
-		
-
-		
-		unlock();
-	}
 }
 
 //--------------------------------------------------------------

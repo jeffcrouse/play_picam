@@ -12,15 +12,14 @@
 #define MODE_CAMERA 1
 #define MODE_VIDEO 2
 
-class shaderApp : public ofBaseApp, public ofxOMXPlayerListener, public ofThread {
+class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 
 	public:
 
 	void setup();
 	void update();
 	void draw();
-	void threadedFunction();
-
+	void randomVideo();
 	void onVideoEnd(ofxOMXPlayerListenerEventData& e);
 	void onVideoLoop(ofxOMXPlayerListenerEventData& e){ /*empty*/ };
 
