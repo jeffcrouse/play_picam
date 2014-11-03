@@ -125,11 +125,7 @@ void shaderApp::update()
 		if(m.getAddress() == "/video") {
 			randomVideo();
 		}
-		
-//		if(m.getAddress() == "/gif") {
-//			string url = m.getArgAsString(0);
-//			loadGIF(url);
-//		}
+
 	}
 
 	if(textChanged)
@@ -225,17 +221,4 @@ void shaderApp::onVideoEnd(ofxOMXPlayerListenerEventData& e) {
 	displayMode = MODE_CAMERA;
 }
 
-//--------------------------------------------------------------
-string ofxSystemCall(string command) {
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) return "ERROR";
-    char buffer[128];
-    string result = "";
-    while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL)
-            result += buffer;
-    }
-    pclose(pipe);
-    result.erase(remove(result.begin(), result.end(), '\n'), result.end());
-    return result;
-}
+

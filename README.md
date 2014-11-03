@@ -53,7 +53,7 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 	1. `make run`
 1. get https://github.com/jvcleave/ofxRPiCameraVideoGrabber
 1. When you are reset to shutdown: `sudo halt`
-1. Launch program from `/etc/rc.d`
+1. Launch program from `/etc/rc.local`
 
 
 
