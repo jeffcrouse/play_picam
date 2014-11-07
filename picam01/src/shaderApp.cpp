@@ -5,6 +5,7 @@
 //--------------------------------------------------------------
 void shaderApp::setup()
 {
+    ofSetLogLevel(OF_LOG_NOTICE);
 	//ofSetLogLevel(OF_LOG_VERBOSE);
 	ofSetLogLevel("ofThread", OF_LOG_SILENT);
 	ofSetVerticalSync(false);
@@ -44,6 +45,7 @@ void shaderApp::setup()
 	font[0].loadFont("fonts/Neue Helvetica/HelveticaNeueLTCom-Bd.ttf", 120);
 	font[1].loadFont("fonts/Neue Helvetica/HelveticaNeueLTCom-Md.ttf", 32);
 
+    
 	ofLogNotice() << "Listing filters";
 	map<string, OMX_IMAGEFILTERTYPE>::iterator it;
 	for(it = OMX_Maps::getInstance().imageFilters.begin();
@@ -64,16 +66,11 @@ void shaderApp::setup()
 
 
 //--------------------------------------------------------------
-void shaderApp::randomVideo() {
-	ofDirectory dir;
-	dir.listDir(VIDEO_DIRECTORY);
-	int n = ofRandom(0, (int)dir.size());
-	string videoPath = dir.getPath(n);
-	string videoName = dir.getName(n);
-
+void shaderApp::playVideo(string videoName, string videoPath) {
+    
 	ofxOMXPlayerSettings settings;
 	settings.videoPath = videoPath;
-	settings.useHDMIForAudio = true;	//default true
+	settings.useHDMIForAudio = false;	//default true
 	settings.enableTexture = true;		//default true
 	settings.enableLooping = false;		//default true
 	settings.enableAudio = true;		//default true, save resources by disabling
@@ -96,8 +93,9 @@ void shaderApp::update()
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
 
+        
 		if(m.getAddress() == "/text"){
-			lineOne = ofToString(m.getArgAsInt32(0));
+			lineOne = ofToString(m.getArgAsFloat(0));
 			lineTwo = m.getArgAsString(1);
 			textChanged = true;
 		}
@@ -123,7 +121,27 @@ void shaderApp::update()
 		}
 
 		if(m.getAddress() == "/video") {
-			randomVideo();
+            if(displayMode!=MODE_VIDEO) {
+   
+                ofDirectory dir;
+                dir.listDir(VIDEO_DIRECTORY);
+                int n = 0;
+                
+                // If we pass in an integer and it's within range of the number of videos we have,
+                // play that video.  Otherwise play a random one.
+                if(m.getNumArgs() > 0 && ofInRange(m.getArgAsInt32(0), 0, dir.size()-1)) {
+                    n = m.getArgAsInt32(0);
+                } else {
+                    n = ofRandom(0, (int)dir.size());
+                }
+                
+                
+                string videoPath = dir.getPath(n);
+                string videoName = dir.getName(n);
+                ofLogNotice("shaderApp") << "!!! PLAYING " << n << " - " << videoName;
+
+                playVideo(videoName, videoPath);
+            }
 		}
 
 	}
@@ -181,6 +199,7 @@ void shaderApp::draw(){
 	switch(displayMode) {
 		case MODE_CAMERA:
 			camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+            overlayFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
 			break;
 
 		case MODE_VIDEO:
@@ -192,9 +211,6 @@ void shaderApp::draw(){
 			break;
 	}
 	
-	overlayFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
-
-
 	stringstream info;
 	info << "APP FPS: " << ofGetFrameRate() << "\n";
 	info << "Camera Resolution: " << videoGrabber.getWidth() << "x" << videoGrabber.getHeight()	<< " @ "<< videoGrabber.getFrameRate() <<"FPS"<< "\n";
@@ -217,7 +233,7 @@ bool ofxStringEndsWith(string &str, string& key) {
 
 //--------------------------------------------------------------
 void shaderApp::onVideoEnd(ofxOMXPlayerListenerEventData& e) {
-	ofLogVerbose(__func__) << " RECEIVED";
+	ofLogNotice(__func__) << " RECEIVED";
 	displayMode = MODE_CAMERA;
 }
 

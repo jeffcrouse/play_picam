@@ -56,6 +56,36 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 1. Launch program from `/etc/rc.local`
 
 
+## Make a "Keep running" script
+1. `crontab -e` and add the line
+
+        */5 * * * * /home/pi/keepalive.sh
+1. Create the file `/home/pi/keepalive.sh`
+
+````
+#!/bin/bash
+# Keepalive script by Jeff Crouse, Nov 7 2014
+
+proc=picam01
+date=$( date +%Y-%m-%d\ %H:%M:%S )
+echo $date Keepalive: $proc >> /home/pi/keepalive.log
+
+if [[ $( pidof $proc | wc -l ) -eq 0 ]] ; then
+	echo $date "$proc has crashed! restarting" >> /home/pi/keepalive.log
+	/home/pi/openFrameworks/apps/play_picam/picam01/bin/picam01 > /home/pi/picam01.log 2>&1
+else
+	echo $date "$proc is fine" >> /home/pi/keepalive.log
+fi
+````
+
+
+
+
+### /etc/rc.local
+If you are confident that your app will never crash, just start it once at startup!
+
+    /home/pi/openFrameworks/apps/play_picam/picam01/bin/picam01 > /home/pi/picam01.log 2>&1
+         
 
 ## REMOVED
 

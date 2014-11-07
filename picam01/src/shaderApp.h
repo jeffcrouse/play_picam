@@ -19,7 +19,7 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 	void setup();
 	void update();
 	void draw();
-	void randomVideo();
+	void playVideo(string ideoName, string videoPath);
 	void onVideoEnd(ofxOMXPlayerListenerEventData& e);
 	void onVideoLoop(ofxOMXPlayerListenerEventData& e){ /*empty*/ };
 
