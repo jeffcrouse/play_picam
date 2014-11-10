@@ -76,7 +76,9 @@ void shaderApp::playVideo(string videoName, string videoPath) {
 	settings.enableAudio = true;		//default true, save resources by disabling
 	settings.listener = this;
 	omxPlayer.setup(settings);
-
+    omxPlayer.setVolume(1);
+    
+    
 	currentVideo = videoName;
 	displayMode = MODE_VIDEO;
 }
@@ -87,12 +89,13 @@ void shaderApp::update()
 	//float now = ofGetElapsedTimef();
 	bool textChanged = false;
 
-	// check for waiting messages
+
+    
+    
 	while(receiver.hasWaitingMessages()){
-		// get the next message
+
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
-
         
 		if(m.getAddress() == "/text"){
 			lineOne = ofToString(m.getArgAsFloat(0));

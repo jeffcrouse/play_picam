@@ -56,6 +56,16 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 1. Launch program from `/etc/rc.local`
 
 
+## Disable Screen Blacking
+
+1. `sudo nano /etc/rc.local`
+
+        # Disable console blanking
+        setterm -blank 0 -powerdown 0 -powersave off
+        
+1. `sudo nano /etc/kdb/config` and change `BLANK_TIME=30` to `BLANK_TIME=0` 
+        
+
 ## Make a "Keep running" script
 1. `crontab -e` and add the line
 
@@ -68,7 +78,6 @@ Taken mostly from [NOOBS setup](http://www.raspberrypi.org/help/noobs-setup/) an
 
 proc=picam01
 date=$( date +%Y-%m-%d\ %H:%M:%S )
-echo $date Keepalive: $proc >> /home/pi/keepalive.log
 
 if [[ $( pidof $proc | wc -l ) -eq 0 ]] ; then
 	echo $date "$proc has crashed! restarting" >> /home/pi/keepalive.log

@@ -19,11 +19,9 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 	void setup();
 	void update();
 	void draw();
-	void playVideo(string ideoName, string videoPath);
+	void playVideo(string videoName, string videoPath);
 	void onVideoEnd(ofxOMXPlayerListenerEventData& e);
 	void onVideoLoop(ofxOMXPlayerListenerEventData& e){ /*empty*/ };
-
-	//void loadGIF(string url);
 
 	ofxRPiCameraVideoGrabber videoGrabber;
 	bool doDrawInfo;
@@ -45,6 +43,5 @@ class shaderApp : public ofBaseApp, public ofxOMXPlayerListener {
 
 	string currentFilter;
 	string currentVideo;
-	//string currentImage;
 };
 
