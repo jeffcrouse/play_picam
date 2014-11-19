@@ -22,6 +22,8 @@ void shaderApp::setup()
 	
 	videoGrabber.setup(omxCameraSettings);
 
+    
+    
 	shader.load("shaderExample");
 	
 
@@ -43,7 +45,7 @@ void shaderApp::setup()
 
 	ofLogNotice() << "Loading fonts";
 	font[0].loadFont("fonts/Neue Helvetica/HelveticaNeueLTCom-Bd.ttf", 120);
-	font[1].loadFont("fonts/Neue Helvetica/HelveticaNeueLTCom-Md.ttf", 32);
+	font[1].loadFont("fonts/Neue Helvetica/HelveticaNeueLTCom-Md.ttf", 48);
 
     
 	ofLogNotice() << "Listing filters";
@@ -61,45 +63,64 @@ void shaderApp::setup()
 		ofLogNotice() << path;
 	}
 
-	displayMode = MODE_CAMERA;
+    ofxOMXPlayerSettings settings;
+    settings.videoPath = dir.getPath(0);
+    settings.useHDMIForAudio = false;	//default true
+    settings.enableTexture = true;		//default true
+    settings.enableLooping = false;		//default true
+    settings.enableAudio = true;		//default true, save resources by disabling
+    settings.listener = this;
+    omxPlayer.setup(settings);
+    omxPlayer.setVolume(1);
+    
+    displayMode = MODE_VIDEO;
+    float duration = omxPlayer.getDuration();
+    videoEndTime = ofGetElapsedTimef() + omxPlayer.getDuration();
+    
+    timeMarkerTime = ofGetElapsedTimef() + 10;
 }	
 
+//--------------------------------------------------------------
+void shaderApp::exit()
+{
+   
+}
 
 //--------------------------------------------------------------
 void shaderApp::playVideo(string videoName, string videoPath) {
     
-	ofxOMXPlayerSettings settings;
-	settings.videoPath = videoPath;
-	settings.useHDMIForAudio = false;	//default true
-	settings.enableTexture = true;		//default true
-	settings.enableLooping = false;		//default true
-	settings.enableAudio = true;		//default true, save resources by disabling
-	settings.listener = this;
-	omxPlayer.setup(settings);
-    omxPlayer.setVolume(1);
-    
-    
+    omxPlayer.loadMovie(videoPath);
 	currentVideo = videoName;
 	displayMode = MODE_VIDEO;
+    float duration = omxPlayer.getDuration();
+    videoEndTime = ofGetElapsedTimef() + omxPlayer.getDuration();
+    ofLogNotice() << "duration = " << duration << " videoEndTime = " << videoEndTime;
 }
 
 //--------------------------------------------------------------
 void shaderApp::update()
 {
-	//float now = ofGetElapsedTimef();
+	float now = ofGetElapsedTimef();
 	bool textChanged = false;
 
-
-    
+    if(now > timeMarkerTime) {
+        ofLogNotice("timestamp") << ofGetElapsedTimef();
+        timeMarkerTime = now + 10;
+    }
     
 	while(receiver.hasWaitingMessages()){
 
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
         
+        if(m.getAddress() == "/camera"){
+            displayMode = MODE_CAMERA;
+        }
+        
 		if(m.getAddress() == "/text"){
-			lineOne = ofToString(m.getArgAsFloat(0));
+			lineOne = m.getArgAsString(0);
 			lineTwo = m.getArgAsString(1);
+            ofLogNotice() << lineOne << " - " << lineTwo;
 			textChanged = true;
 		}
 
@@ -152,7 +173,8 @@ void shaderApp::update()
 	if(textChanged)
 	{
 		overlayFbo.begin();
-
+            int dropshadow = 8;
+        
 			ofClear(0, 0, 0, 0);
 			ofRectangle box;
 			int x;
@@ -161,7 +183,7 @@ void shaderApp::update()
 			box = font[0].getStringBoundingBox(lineOne, 0, 0);
 			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
 			ofSetColor(ofColor::black);
-			font[0].drawString(lineOne, x+2, y+2);
+			font[0].drawString(lineOne, x+dropshadow, y+dropshadow);
 			ofSetColor(ofColor::white);
 			font[0].drawString(lineOne, x, y);
 			
@@ -172,7 +194,7 @@ void shaderApp::update()
 			box = font[1].getStringBoundingBox(lineTwo, 0, 0);
 			x = (overlayFbo.getWidth()/2.0) - (box.width/2.0);
 			ofSetColor(ofColor::black);
-			font[1].drawString(lineTwo, x+2, y+2);
+			font[1].drawString(lineTwo, x+dropshadow, y+dropshadow);
 			ofSetColor(ofColor::white);
 			font[1].drawString(lineTwo, x, y);
 
@@ -192,13 +214,34 @@ void shaderApp::update()
 		shader.end();
 		camFbo.end();
 	}
-
+    
+    if(displayMode == MODE_VIDEO && now > videoEndTime)
+    {
+        ofLogVerbose(__func__) << "Forcefully ending video";
+        displayMode = MODE_CAMERA;
+    }
+    
+    
+//    if(stopVideo)
+//    {
+//        ofLogVerbose(__func__) << "Stopping Video";
+//        if(omxPlayer.isTextureEnabled) {
+//            //clear the texture if you want
+//            omxPlayer.getTextureReference().clear();
+//        }
+//        displayMode = MODE_CAMERA;
+//        stopVideo=false;
+//    }
 }
 
 //--------------------------------------------------------------
 void shaderApp::draw(){
-	ofBackground(0);
-
+	ofBackgroundGradient(ofColor::white, ofColor::blue, OF_GRADIENT_CIRCULAR);
+    
+//    ofSetColor(ofColor::red);
+//    ofCircle(ofGetWidth()/2.0, ofGetHeight()/2.0, 50);
+    ofSetColor(ofColor::white);
+    
 	switch(displayMode) {
 		case MODE_CAMERA:
 			camFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -237,7 +280,7 @@ bool ofxStringEndsWith(string &str, string& key) {
 //--------------------------------------------------------------
 void shaderApp::onVideoEnd(ofxOMXPlayerListenerEventData& e) {
 	ofLogNotice(__func__) << " RECEIVED";
-	displayMode = MODE_CAMERA;
+    displayMode = MODE_CAMERA;
 }
 
 
